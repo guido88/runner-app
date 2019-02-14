@@ -1,0 +1,21 @@
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+#startRace{
+	background-color: green;
+}
+
+#endRace{
+	background-color: red;
+}
+
+#addName{
+	background-color: blue;
+}
+
+button{
+	background-color: orange;
+}
+

@@ -131,7 +131,7 @@ const clickName = (row) => {
     let tdTotal =row.querySelectorAll('td')[2];
     let total = totalTime(clock.getDate(),newDate);
     tdTotal.innerHTML=total;
-    runner.total=total;
+    runner.total=newDate-clock.getDate();
 
     let tdAvg =row.querySelectorAll('td')[3];
     let avg = average(clock.getDate(),newDate,laps);
@@ -142,70 +142,34 @@ const clickName = (row) => {
     let tdLast =row.querySelectorAll('td')[4];
     let last = calcLastLap(newDate-runner.current);
     tdLast.innerHTML=last;
-    runner.last=last;
+    runner.last=newDate-runner.current;
 
     runner.current = newDate;
 
-    calcFastestLap(mapRunners,name,last);
+    calcFastestLap(mapRunners,name,runner.last);
 
     console.log(mapRunners);
-  }
+   }
 };
 
 function calcLastLap(last_lap){
 
- 
-    let hours = (Math.floor(last_lap/(3600*1000)))%60;
-    let mins = (Math.floor(last_lap/(60*1000)))%60;
-    let secs = (Math.floor(last_lap/1000))%60;
-
-    if(hours<10)
-      hours= '0'+hours;
-    if(mins<10)
-      mins='0'+mins;
-    if(secs<10)
-      secs='0'+secs;
-
-    return hours+":"+mins+":"+secs;
+  return format(last_lap);
 
 }
 
 function average(start,end,lap_count){
 
     let diff= (end-start)/lap_count;
-    console.log(diff);
-    let hours = (Math.floor(diff/(3600*1000)))%60;
-    let mins = (Math.floor(diff/(60*1000)))%60;
-    let secs = (Math.floor(diff/1000))%60;
-
-    if(hours<10)
-      hours= '0'+hours;
-    if(mins<10)
-      mins='0'+mins;
-    if(secs<10)
-      secs='0'+secs;
-
-    return hours+":"+mins+":"+secs;
+    
+    return format(diff);
    
 }
 
 function totalTime(start,end){
 
     let diff= (end-start)
-    console.log(diff);
-    let hours = (Math.floor(diff/(3600*1000)))%60;
-    let mins = (Math.floor(diff/(60*1000)))%60;
-    let secs = (Math.floor(diff/1000))%60;
-
-    if(hours<10)
-      hours= '0'+hours;
-    if(mins<10)
-      mins='0'+mins;
-    if(secs<10)
-      secs='0'+secs;
-
-    return hours+":"+mins+":"+secs;
-   
+    return format(diff);
 }
 
 function cleanTable(table){
@@ -220,7 +184,6 @@ function cleanTable(table){
 
 }
 
-//REVISION
 function calcFastestLap(map,name,last){
 
   let runner = map.get(name);
@@ -268,10 +231,19 @@ function calcFinalStats(map){
         minTime = c_total;
         name_runner=k;
       }
-      else if(c_count>maxCount && c_total<minTime){
-        maxCount=c_count;
-        minTime = c_total;
-        name_runner=k;
+      else if(c_count>maxCount){
+
+          maxCount=c_count;
+          minTime = c_total;
+          name_runner=k;
+        
+      } else if (c_count==maxCount) {
+        
+        if(c_total<minTime){
+          maxCount=c_count;
+          minTime = c_total;
+          name_runner=k;
+        }
       }
       
       if(fastest==0){
@@ -287,9 +259,9 @@ function calcFinalStats(map){
     }
 
     let span1 = document.createElement("span");
-    span1.innerHTML="The max count is: "+maxCount+" and time: "+minTime+" "+name_runner;
+    span1.innerHTML="The max count is: "+ maxCount + " and time: "+format(minTime)+" "+name_runner;
     let span2 = document.createElement("span");
-    span2.innerHTML="The fastest lap is: "+fastest+" and runner is : "+name_fast_lap;
+    span2.innerHTML="The fastest lap is: "+format(fastest)+" and runner is : " +name_fast_lap;
 
     span1.setAttribute("id",1);
     span2.setAttribute("id",2);
@@ -305,6 +277,7 @@ addName.addEventListener("click", () => {
  if(!clock.isStarted()){
     createRow(table);
   }
+
 });
 
 
@@ -330,3 +303,20 @@ endRace.addEventListener("click", () => {
     cleanTable(table);
     mapRunners.clear();
 });
+
+
+function format(time){
+    
+    let hours = (Math.floor(time/(3600*1000)))%60;
+    let mins = (Math.floor(time/(60*1000)))%60;
+    let secs = (Math.floor(time/1000))%60;
+
+    if(hours<10)
+      hours= '0'+hours;
+    if(mins<10)
+      mins='0'+mins;
+    if(secs<10)
+      secs='0'+secs;
+
+    return hours+":"+mins+":"+secs;
+}
